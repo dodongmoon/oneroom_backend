@@ -56,9 +56,15 @@ const initDb = async () => {
         room_number TEXT NOT NULL,
         floor INT NOT NULL,
         status TEXT NOT NULL DEFAULT 'vacant',
+        memo TEXT DEFAULT '',
         UNIQUE(building_name, room_number)
       );
     `);
+
+        // Add memo column if it doesn't exist (migration for existing DB)
+        await pool.query(`
+            ALTER TABLE rooms ADD COLUMN IF NOT EXISTS memo TEXT DEFAULT '';
+        `);
 
         // Seed Check - simple check if empty
         const { rows } = await pool.query('SELECT COUNT(*) FROM rooms');
@@ -68,14 +74,14 @@ const initDb = async () => {
             const rooms = [];
             // Building B seed
             for (let f = 2; f <= 4; f++) {
-                for (let r = 1; r <= 6; r++) rooms.push(`('B', ${f}, '${f}0${r}', 'vacant')`);
+                for (let r = 1; r <= 6; r++) rooms.push(`('B', ${f}, '${f}0${r}', 'vacant', '')`);
             }
             // Building C seed
             for (let f = 2; f <= 4; f++) {
-                for (let r = 1; r <= 5; r++) rooms.push(`('C', ${f}, '${f}0${r}', 'vacant')`);
+                for (let r = 1; r <= 5; r++) rooms.push(`('C', ${f}, '${f}0${r}', 'vacant', '')`);
             }
 
-            const query = `INSERT INTO rooms (building_name, floor, room_number, status) VALUES ${rooms.join(',')}`;
+            const query = `INSERT INTO rooms (building_name, floor, room_number, status, memo) VALUES ${rooms.join(',')}`;
             await pool.query(query);
             console.log("Database Seeded!");
         }
@@ -99,13 +105,28 @@ io.on('connection', async (socket) => {
     }
 
     // Handle Updates
-    socket.on('update_room', async ({ id, status }) => {
+    // Handle Updates
+    socket.on('update_room', async ({ id, status, memo }) => {
         try {
-            // Update DB
-            const result = await pool.query(
-                'UPDATE rooms SET status = $1 WHERE id = $2 RETURNING *',
-                [status, id]
-            );
+            const updates = [];
+            const values = [];
+            let idx = 1;
+
+            if (status !== undefined) {
+                updates.push(`status = $${idx++}`);
+                values.push(status);
+            }
+            if (memo !== undefined) {
+                updates.push(`memo = $${idx++}`);
+                values.push(memo);
+            }
+
+            if (updates.length === 0) return;
+
+            values.push(id);
+            const query = `UPDATE rooms SET ${updates.join(', ')} WHERE id = $${idx} RETURNING *`;
+
+            const result = await pool.query(query, values);
 
             if (result.rows.length > 0) {
                 // Broadcast to everyone (including sender)

@@ -13,6 +13,23 @@ app.get('/', (req, res) => {
     res.send('Server is running successfully!');
 });
 
+// Temporary Seed Route for Building A
+app.get('/seed-a', async (req, res) => {
+    try {
+        const query = `
+      INSERT INTO rooms (building_name, floor, room_number, status) VALUES
+      ('A', 4, '401', 'vacant'), ('A', 4, '402', 'vacant'), ('A', 4, '403', 'vacant'), ('A', 4, '404', 'vacant'),
+      ('A', 3, '301', 'vacant'), ('A', 3, '302', 'vacant'), ('A', 3, '303', 'vacant'), ('A', 3, '304', 'vacant'), ('A', 3, '305', 'vacant'),
+      ('A', 2, '201', 'vacant'), ('A', 2, '202', 'vacant'), ('A', 2, '203', 'vacant'), ('A', 2, '204', 'vacant'), ('A', 2, '205', 'vacant')
+      ON CONFLICT (building_name, room_number) DO NOTHING;
+    `;
+        await pool.query(query);
+        res.send('Building A Created! (14 rooms added)');
+    } catch (err) {
+        res.status(500).send('Error: ' + err.message);
+    }
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {

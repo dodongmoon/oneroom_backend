@@ -18,9 +18,9 @@ app.get('/seed-a', async (req, res) => {
     try {
         const query = `
       INSERT INTO rooms (building_name, floor, room_number, status) VALUES
-      ('A', 4, '401', 'vacant'), ('A', 4, '402', 'vacant'), ('A', 4, '403', 'vacant'), ('A', 4, '404', 'vacant'),
-      ('A', 3, '301', 'vacant'), ('A', 3, '302', 'vacant'), ('A', 3, '303', 'vacant'), ('A', 3, '304', 'vacant'), ('A', 3, '305', 'vacant'),
-      ('A', 2, '201', 'vacant'), ('A', 2, '202', 'vacant'), ('A', 2, '203', 'vacant'), ('A', 2, '204', 'vacant'), ('A', 2, '205', 'vacant')
+      ('A', 4, '401', 'ready'), ('A', 4, '402', 'ready'), ('A', 4, '403', 'ready'), ('A', 4, '404', 'ready'),
+      ('A', 3, '301', 'ready'), ('A', 3, '302', 'ready'), ('A', 3, '303', 'ready'), ('A', 3, '304', 'ready'), ('A', 3, '305', 'ready'),
+      ('A', 2, '201', 'ready'), ('A', 2, '202', 'ready'), ('A', 2, '203', 'ready'), ('A', 2, '204', 'ready'), ('A', 2, '205', 'ready')
       ON CONFLICT (building_name, room_number) DO NOTHING;
     `;
         await pool.query(query);
@@ -55,7 +55,7 @@ const initDb = async () => {
         building_name TEXT NOT NULL,
         room_number TEXT NOT NULL,
         floor INT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'vacant',
+        status TEXT NOT NULL DEFAULT 'ready',
         memo TEXT DEFAULT '',
         UNIQUE(building_name, room_number)
       );
@@ -74,11 +74,11 @@ const initDb = async () => {
             const rooms = [];
             // Building B seed
             for (let f = 2; f <= 4; f++) {
-                for (let r = 1; r <= 6; r++) rooms.push(`('B', ${f}, '${f}0${r}', 'vacant', '')`);
+                for (let r = 1; r <= 6; r++) rooms.push(`('B', ${f}, '${f}0${r}', 'ready', '')`);
             }
             // Building C seed
             for (let f = 2; f <= 4; f++) {
-                for (let r = 1; r <= 5; r++) rooms.push(`('C', ${f}, '${f}0${r}', 'vacant', '')`);
+                for (let r = 1; r <= 5; r++) rooms.push(`('C', ${f}, '${f}0${r}', 'ready', '')`);
             }
 
             const query = `INSERT INTO rooms (building_name, floor, room_number, status, memo) VALUES ${rooms.join(',')}`;

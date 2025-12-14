@@ -61,9 +61,14 @@ const initDb = async () => {
       );
     `);
 
-        // Add memo column if it doesn't exist (migration for existing DB)
+        // Add memo column if it doesn't exist
         await pool.query(`
             ALTER TABLE rooms ADD COLUMN IF NOT EXISTS memo TEXT DEFAULT '';
+        `);
+
+        // Add is_deposit_paid column if it doesn't exist (migration)
+        await pool.query(`
+            ALTER TABLE rooms ADD COLUMN IF NOT EXISTS is_deposit_paid BOOLEAN DEFAULT FALSE;
         `);
 
         // Seed Check - simple check if empty
@@ -74,14 +79,14 @@ const initDb = async () => {
             const rooms = [];
             // Building B seed
             for (let f = 2; f <= 4; f++) {
-                for (let r = 1; r <= 6; r++) rooms.push(`('B', ${f}, '${f}0${r}', 'ready', '')`);
+                for (let r = 1; r <= 6; r++) rooms.push(`('B', ${f}, '${f}0${r}', 'ready', '', false)`);
             }
             // Building C seed
             for (let f = 2; f <= 4; f++) {
-                for (let r = 1; r <= 5; r++) rooms.push(`('C', ${f}, '${f}0${r}', 'ready', '')`);
+                for (let r = 1; r <= 5; r++) rooms.push(`('C', ${f}, '${f}0${r}', 'ready', '', false)`);
             }
 
-            const query = `INSERT INTO rooms (building_name, floor, room_number, status, memo) VALUES ${rooms.join(',')}`;
+            const query = `INSERT INTO rooms (building_name, floor, room_number, status, memo, is_deposit_paid) VALUES ${rooms.join(',')}`;
             await pool.query(query);
             console.log("Database Seeded!");
         }
@@ -105,8 +110,7 @@ io.on('connection', async (socket) => {
     }
 
     // Handle Updates
-    // Handle Updates
-    socket.on('update_room', async ({ id, status, memo }) => {
+    socket.on('update_room', async ({ id, status, memo, is_deposit_paid }) => {
         try {
             const updates = [];
             const values = [];
@@ -119,6 +123,10 @@ io.on('connection', async (socket) => {
             if (memo !== undefined) {
                 updates.push(`memo = $${idx++}`);
                 values.push(memo);
+            }
+            if (is_deposit_paid !== undefined) {
+                updates.push(`is_deposit_paid = $${idx++}`);
+                values.push(is_deposit_paid);
             }
 
             if (updates.length === 0) return;

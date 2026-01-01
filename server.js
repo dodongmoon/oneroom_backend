@@ -39,12 +39,18 @@ const io = new Server(server, {
 });
 
 // Database Connection
-const pool = new Pool({
+// Database Connection
+const poolConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: {
+};
+
+if (process.env.DATABASE_URL && !process.env.DATABASE_URL.includes('localhost')) {
+    poolConfig.ssl = {
         rejectUnauthorized: false
-    }
-});
+    };
+}
+
+const pool = new Pool(poolConfig);
 
 // Create Table if not exists
 const initDb = async () => {
@@ -71,6 +77,11 @@ const initDb = async () => {
             ALTER TABLE rooms ADD COLUMN IF NOT EXISTS is_deposit_paid BOOLEAN DEFAULT FALSE;
         `);
 
+        // Add move_in_date column if it doesn't exist (migration)
+        await pool.query(`
+            ALTER TABLE rooms ADD COLUMN IF NOT EXISTS move_in_date TEXT DEFAULT '';
+        `);
+
         // Seed Check - simple check if empty
         const { rows } = await pool.query('SELECT COUNT(*) FROM rooms');
         if (parseInt(rows[0].count) === 0) {
@@ -79,14 +90,14 @@ const initDb = async () => {
             const rooms = [];
             // Building B seed
             for (let f = 2; f <= 4; f++) {
-                for (let r = 1; r <= 6; r++) rooms.push(`('B', ${f}, '${f}0${r}', 'ready', '', false)`);
+                for (let r = 1; r <= 6; r++) rooms.push(`('B', ${f}, '${f}0${r}', 'ready', '', false, '')`);
             }
             // Building C seed
             for (let f = 2; f <= 4; f++) {
-                for (let r = 1; r <= 5; r++) rooms.push(`('C', ${f}, '${f}0${r}', 'ready', '', false)`);
+                for (let r = 1; r <= 5; r++) rooms.push(`('C', ${f}, '${f}0${r}', 'ready', '', false, '')`);
             }
 
-            const query = `INSERT INTO rooms (building_name, floor, room_number, status, memo, is_deposit_paid) VALUES ${rooms.join(',')}`;
+            const query = `INSERT INTO rooms (building_name, floor, room_number, status, memo, is_deposit_paid, move_in_date) VALUES ${rooms.join(',')}`;
             await pool.query(query);
             console.log("Database Seeded!");
         }
@@ -110,7 +121,7 @@ io.on('connection', async (socket) => {
     }
 
     // Handle Updates
-    socket.on('update_room', async ({ id, status, memo, is_deposit_paid }) => {
+    socket.on('update_room', async ({ id, status, memo, is_deposit_paid, move_in_date }) => {
         try {
             const updates = [];
             const values = [];
@@ -127,6 +138,10 @@ io.on('connection', async (socket) => {
             if (is_deposit_paid !== undefined) {
                 updates.push(`is_deposit_paid = $${idx++}`);
                 values.push(is_deposit_paid);
+            }
+            if (move_in_date !== undefined) {
+                updates.push(`move_in_date = $${idx++}`);
+                values.push(move_in_date);
             }
 
             if (updates.length === 0) return;

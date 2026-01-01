@@ -1,0 +1,40 @@
+Server running on port 3000
+Error initializing DB: Error: The server does not support SSL connections
+    at /Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async initDb (/Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/server.js:52:9)
+User connected: BSvMw53MjU3CJC_gAAAB
+Error: The server does not support SSL connections
+    at /Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Namespace.<anonymous> (/Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/server.js:111:24)
+User disconnected: BSvMw53MjU3CJC_gAAAB
+User connected: C5Mwc_YKvwPDXdhhAAAE
+Error: The server does not support SSL connections
+    at /Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Namespace.<anonymous> (/Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/server.js:111:24)
+User disconnected: C5Mwc_YKvwPDXdhhAAAE
+User connected: W3zG--8qZUB8ERENAAAH
+Error: The server does not support SSL connections
+    at /Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Namespace.<anonymous> (/Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/server.js:111:24)
+User disconnected: W3zG--8qZUB8ERENAAAH
+User connected: xWEwF8q84Odnz-xCAAAK
+Error: The server does not support SSL connections
+    at /Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Namespace.<anonymous> (/Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/server.js:111:24)
+User disconnected: xWEwF8q84Odnz-xCAAAK
+User connected: b-btSeVS7LwbYjpOAAAN
+Error: The server does not support SSL connections
+    at /Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Namespace.<anonymous> (/Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/server.js:111:24)
+User disconnected: b-btSeVS7LwbYjpOAAAN
+User connected: Dq1XIj3NjhQJlakRAAAQ
+Error: The server does not support SSL connections
+    at /Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/node_modules/pg-pool/index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Namespace.<anonymous> (/Volumes/SanDiskSSD/mac_usb/cursor/one_room/rental-management/backend/server.js:111:24)
